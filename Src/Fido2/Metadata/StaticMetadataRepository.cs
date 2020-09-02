@@ -33,6 +33,19 @@ namespace Fido2NetLib
                                 "sG/5xUb/Btwb2X2g4InpiB/yt/3CpQXpiWX/K4mBvUKiGn05ZsqeY1gx4g0xLBqc" +
                                 "U9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==";
 
+        // from https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem
+        protected const string APPLE_ROOT = "MIICEjCCAZmgAwIBAgIQaB0BbHo84wIlpQGUKEdXcTAKBggqhkjOPQQDAzBLMR8w" +
+                                "HQYDVQQDDBZBcHBsZSBXZWJBdXRobiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJ" +
+                                "bmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMB4XDTIwMDMxODE4MjEzMloXDTQ1MDMx" +
+                                "NTAwMDAwMFowSzEfMB0GA1UEAwwWQXBwbGUgV2ViQXV0aG4gUm9vdCBDQTETMBEG" +
+                                "A1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTB2MBAGByqGSM49" +
+                                "AgEGBSuBBAAiA2IABCJCQ2pTVhzjl4Wo6IhHtMSAzO2cv+H9DQKev3//fG59G11k" +
+                                "xu9eI0/7o6V5uShBpe1u6l6mS19S1FEh6yGljnZAJ+2GNP1mi/YK2kSXIuTHjxA/" +
+                                "pcoRf7XkOtO4o1qlcaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUJtdk" +
+                                "2cV4wlpn0afeaxLQG2PxxtcwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMDA2cA" +
+                                "MGQCMFrZ+9DsJ1PW9hfNdBywZDsWDbWFp28it1d/5w2RPkRX3Bbn/UbDTNLx7Jr3" +
+                                "jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B" +
+                                "1bWeT0vT";
 
         public StaticMetadataRepository(DateTime? cacheUntil = null)
         {
@@ -127,13 +140,13 @@ namespace Fido2NetLib
                     Description = "Windows Hello Software Authenticator",
                     AuthenticatorVersion = 1,
                     ProtocolFamily = "fido2",
-                    Upv = new UafVersion[] 
-                    { 
-                        new UafVersion() 
-                        { 
+                    Upv = new UafVersion[]
+                    {
+                        new UafVersion()
+                        {
                             Major = 1,
-                            Minor = 0 
-                        } 
+                            Minor = 0
+                        }
                     },
                     AssertionScheme = "FIDOV2",
                     AuthenticationAlgorithm = 12,
@@ -143,7 +156,7 @@ namespace Fido2NetLib
                         new VerificationMethodDescriptor[]
                         {
                             new VerificationMethodDescriptor()
-                            { 
+                            {
                                 UserVerification = 2 // USER_VERIFY_FINGERPRINT_INTERNAL
                             }
                         },
@@ -352,6 +365,83 @@ namespace Fido2NetLib
                 }
             };
             _entries.Add(new Guid(msftWhfbHardwareVbs.AaGuid), msftWhfbHardwareVbs);
+
+            var appleHardwareAuthenticator = new MetadataTOCPayloadEntry
+            {
+                AaGuid = "00000000-0000-0000-0000-000000000000", // Yes, this is the actual "guid" that the authenticator returns
+                Hash = "",
+                StatusReports = new StatusReport[]
+                {
+                    new StatusReport
+                    {
+                        Status = AuthenticatorStatus.NOT_FIDO_CERTIFIED
+                    }
+                },
+                MetadataStatement = new MetadataStatement
+                {
+                    AttestationTypes = new ushort[]
+                    {
+                        (ushort)MetadataAttestationType.ATTESTATION_BASIC_FULL
+                    },
+                    Hash = "",
+                    Description = "Apple Hardware Authenticator",
+                    AttestationRootCertificates = new string[]
+                    {
+                        APPLE_ROOT
+                    },
+                    AuthenticatorVersion = 1,
+                    ProtocolFamily = "fido2",
+                    Upv = new UafVersion[]
+                    {
+                        new UafVersion()
+                        {
+                            Major = 1,
+                            Minor = 0
+                        }
+                    },
+                    AssertionScheme = "FIDOV2",
+                    AuthenticationAlgorithm = 12,
+                    PublicKeyAlgAndEncoding = 260,
+                    UserVerificationDetails = new VerificationMethodDescriptor[][]
+                    {
+                        new VerificationMethodDescriptor[]
+                        {
+                            new VerificationMethodDescriptor()
+                            {
+                                UserVerification = 2 // USER_VERIFY_FINGERPRINT_INTERNAL
+                            }
+                        },
+                        new VerificationMethodDescriptor[]
+                        {
+                            new VerificationMethodDescriptor()
+                            {
+                                UserVerification = 4 // USER_VERIFY_PASSCODE_INTERNAL
+                            }
+                        },
+                        new VerificationMethodDescriptor[]
+                        {
+                            new VerificationMethodDescriptor()
+                            {
+                                UserVerification = 16 // USER_VERIFY_FACEPRINT_INTERNAL
+                            }
+                        },
+                        new VerificationMethodDescriptor[]
+                        {
+                             new VerificationMethodDescriptor()
+                            {
+                                UserVerification = 64 // USER_VERIFY_EYEPRINT_INTERNAL
+                            }
+                        }
+                    },
+                    KeyProtection = 6, // KEY_PROTECTION_HARDWARE & KEY_PROTECTION_TEE
+                    MatcherProtection = 2, // MATCHER_PROTECTION_TEE
+                    AttachmentHint = 1, // ATTACHMENT_HINT_INTERNAL
+                    IsSecondFactorOnly = false,
+                    TcDisplay = 0,
+                    Icon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAkCAQAAAA02ELiAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfjCRkQAx/GBkSuAAABlUlEQVRIx53WO0jDQBjA8X8TtUsHK1IXQag4WNxEEETBom5uIk7OLuJkHYoKHUQdHMXH4lrBTXCyILiIgjr4AouDig8sCoK1xXoOaXKxFumXuyGX3P3u8eUuBCpLYRY4I4Y4mST4RKEYl9NNVDH3SHHCoXdUy2gzeQePScddcugOPim+KNI9AvJIZ1HkmcdfrtJXEtkILZhcc8o3ADGe2eaFEN3UY3LOCW9/uwkwy72zwkdWiWICbUxzRMGpyZGk/TeNcOlU6/zKTZmnijxxTTt4L9vovxwHAwiSFMdSUWcV1sSjFhixaKNrD1WaZ+wJTIjpNYZFDaLijbNe3AMYtInxvl0wCInxrcZ+MVYaZ8S4UeMnMe7T+EGMR6mxD2GYXiGuI2tHvEu8SRQFhixc7eFEKb6IW9/SDQ9YoTgwgGW8pUP74mXdrRbu94CTegpbQvpBWOMm3kR46vfyB/mumKYwS6M3VyFN28fY3UOKWjpd9xlS7HKFjwbX0xsGuCv/7oY5JkeaFaJUuX4qJtnnkTSLBHXjH+9nteb83M2CAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTA5LTI1VDE2OjAzOjMxKzAwOjAwWhFE/AAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wOS0yNVQxNjowMzozMSswMDowMCtM/EAAAAAASUVORK5CYII="
+                }
+            };
+            _entries.Add(new Guid(appleHardwareAuthenticator.AaGuid), appleHardwareAuthenticator);
 
             foreach (var entry in _entries)
             {
