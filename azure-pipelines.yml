@@ -86,7 +86,7 @@ jobs:
   - task: NuGetToolInstaller@0
     displayName: Set up NuGet tool
     inputs:
-    versionSpec: '5.4.x'
+      versionSpec: '5.4.x'
   - task: NugetCommand@2
     displayName: Create NuGet packages
     inputs:
