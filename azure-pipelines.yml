@@ -75,3 +75,29 @@ jobs:
       codeCoverageTool: Cobertura
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
       reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'
+
+# Upload packages
+- job: upload
+  displayName: Upload packages
+  pool:
+    vmImage: $(TargetVmImage)
+  dependsOn: tests
+  steps:
+  - task: NuGetToolInstaller@0
+    displayName: Set up NuGet tool
+    inputs:
+    versionSpec: '5.4.x'
+  - task: NugetCommand@2
+    displayName: Create NuGet packages
+    inputs:
+      command: pack
+      packagesToPack: 'Src/**/*.csproj'
+      packDestination: '$(Build.ArtifactStagingDirectory)'
+  - task: NuGetCommand@2
+    displayName: Upload NuGet packages
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+      feedsToUse: 'select'
+      publishVstsFeed: 'release'
+      allowPackageConflicts: true
