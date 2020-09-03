@@ -37,7 +37,15 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./scripts/buildRelease.ps1
-      arguments: '"-p:Version=$(Build.BuildNumber)-vipps"'
+      arguments: '"-p:Version=2.0.0-preview2-vipps$(Build.BuildNumber)"'
+  - task: NuGetCommand@2
+    displayName: Upload NuGet packages
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.SourcesDirectory)/Src/**/bin/Release/*.nupkg'
+      feedsToUse: 'select'
+      publishVstsFeed: 'release'
+      allowPackageConflicts: true
 
 # Publish the demo website
 - job: demo
@@ -75,19 +83,3 @@ jobs:
       codeCoverageTool: Cobertura
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
       reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'
-
-# Upload packages
-- job: upload
-  displayName: Upload packages
-  pool:
-    vmImage: $(TargetVmImage)
-  dependsOn: tests
-  steps:
-  - task: NuGetCommand@2
-    displayName: Upload NuGet packages
-    inputs:
-      command: 'push'
-      packagesToPush: '$(Build.SourcesDirectory)/Src/**/bin/Release/*.nupkg'
-      feedsToUse: 'select'
-      publishVstsFeed: 'release'
-      allowPackageConflicts: true
