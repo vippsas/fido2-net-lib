@@ -37,7 +37,7 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./scripts/buildRelease.ps1
-      arguments: '"-p:Version=$(Build.BuildNumber)-development"'
+      arguments: '"-p:Version=$(Build.BuildNumber)-vipps"'
 
 # Publish the demo website
 - job: demo
@@ -83,21 +83,11 @@ jobs:
     vmImage: $(TargetVmImage)
   dependsOn: tests
   steps:
-  - task: NuGetToolInstaller@0
-    displayName: Set up NuGet tool
-    inputs:
-      versionSpec: '5.4.x'
-  - task: NugetCommand@2
-    displayName: Create NuGet packages
-    inputs:
-      command: pack
-      packagesToPack: 'Src/**/*.csproj'
-      packDestination: '$(Build.ArtifactStagingDirectory)'
   - task: NuGetCommand@2
     displayName: Upload NuGet packages
     inputs:
       command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+      packagesToPush: '$(Build.SourcesDirectory)/Src/**/bin/Release/*.nupkg'
       feedsToUse: 'select'
       publishVstsFeed: 'release'
       allowPackageConflicts: true
