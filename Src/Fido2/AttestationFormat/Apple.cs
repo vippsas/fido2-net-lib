@@ -49,7 +49,7 @@ namespace Fido2NetLib.AttestationFormat
                 // X509Certificate2.NotBefore/.NotAfter return LOCAL DateTimes, so
                 // it's correct to compare using DateTime.Now.
                 if (DateTime.Now < x5ccert.NotBefore || DateTime.Now > x5ccert.NotAfter)
-                    throw new Fido2VerificationException("Apple signing certificate expired or not yet valid");
+                    throw new Fido2VerificationException("One or more of the signing certificates in x5c expired or not yet valid");
             }
 
             // The attestation certificate attestnCert MUST be the first element in the array.

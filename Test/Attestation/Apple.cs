@@ -239,7 +239,7 @@ namespace Test.Attestation
                         .Add("x5c", X5c));
 
                     var ex = Assert.ThrowsAsync<Fido2VerificationException>(MakeAttestationResponse);
-                    Assert.Equal("Apple signing certificate expired or not yet valid", ex.Result.Message);
+                    Assert.Equal("One or more of the signing certificates in x5c expired or not yet valid", ex.Result.Message);
                 }
             }
         }
@@ -293,7 +293,7 @@ namespace Test.Attestation
                         .Add("x5c", X5c));
 
                     var ex = Assert.ThrowsAsync<Fido2VerificationException>(MakeAttestationResponse);
-                    Assert.Equal("Apple signing certificate expired or not yet valid", ex.Result.Message);
+                    Assert.Equal("One or more of the signing certificates in x5c expired or not yet valid", ex.Result.Message);
                 }
             }
         }
