@@ -77,9 +77,3 @@ jobs:
       command: test
       projects: '**/Test.csproj'
       arguments: --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/ExternalLibs/**"
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish code coverage'
-    inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
-      reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'
