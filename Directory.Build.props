@@ -8,8 +8,8 @@
     <RepositoryUrl>https://github.com/abergs/fido2-net-lib</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>fido2 webauthn</PackageTags>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/abergs/fido2-net-lib</PackageProjectUrl>
+    <PackageReleaseNotes>Vipps private build</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/vippsas/fido2-net-lib</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <!-- GLOBALLY USABLE VARIABLES -->
