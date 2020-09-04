@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -35,10 +36,10 @@ namespace Fido2NetLib.AttestationFormat
                 throw new Fido2VerificationException("Malformed x5c array in apple attestation statement");
 
             // Validate certificate lifetimes
-            var enumerator = X5c.Values.GetEnumerator();
+            using var enumerator = X5c.Values.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                if (null == enumerator || null == enumerator.Current
+                if (null == enumerator.Current
                     || CBORType.ByteString != enumerator.Current.Type
                     || 0 == enumerator.Current.GetByteString().Length)
                     throw new Fido2VerificationException("Malformed x5c cert found in apple attestation statement");
@@ -62,21 +63,21 @@ namespace Fido2NetLib.AttestationFormat
             if (IsAttnCertCACert(attestnCert.Extensions))
                 throw new Fido2VerificationException("Attestation certificate has CA cert flag present");
 
-            // Verify that the x5c array contains the intermediate and leaf certificates for atttestation,
+            // Verify that the x5c array contains the intermediate and leaf certificates for attestation,
             // starting from the credential certificate stored in the first data buffer in the array.
             // Verify the validity of the certificates using Apple's Webauthn Root CA
             var trustPath = X5c.Values
                 .Select(x => new X509Certificate2(x.GetByteString()))
                 .ToArray();
 
-            // If the authenticator is listed as in the metadata as one that should produce a basic full attestation, build and verify the chain
+            // If the authenticator is listed in the metadata as one that should produce a basic full attestation, build and verify the chain
             var entry = _metadataService?.GetEntry(AuthData.AttestedCredentialData.AaGuid);
 
             // while conformance testing, we must reject any authenticator that we cannot get metadata for
             if (_metadataService?.ConformanceTesting() == true && null == entry)
                 throw new Fido2VerificationException("AAGUID not found in MDS test metadata");
 
-            // If the authenticator is listed as in the metadata as one that should produce a basic full attestation, build and verify the chain
+            // If the authenticator is listed in the metadata as one that should produce a basic full attestation, build and verify the chain
             if (entry?.MetadataStatement?.AttestationTypes.Contains((ushort)MetadataAttestationType.ATTESTATION_BASIC_FULL) ?? false)
             {
                 var attestationRootCertificates = entry.MetadataStatement.AttestationRootCertificates
@@ -90,11 +91,11 @@ namespace Fido2NetLib.AttestationFormat
             }
 
             // 2. Create clientDataHash as the SHA256 hash of the client data, and append that hash to the end of the authenticator
-            // data (authData from the decoded object)
+            // data (authData from the decoded object). The "Data" property contains this concatenation.
             // 3. Generate SHA-256 hash of the concatenation of authData and clientDataHash, i.e. SHA256(authData || SHA256(clientData))
             var expectedNonce = SHA256.Create().ComputeHash(Data);
 
-            // 4. Obbtain the value of the credCert extension with OID 1.2.840.113635.100.8.2, whihc is a DER-encoded ASN.1 sequence.
+            // 4. Obtain the value of the credCert extension with OID 1.2.840.113635.100.8.2, whihc is a DER-encoded ASN.1 sequence.
             // Decode the sequence and extract the single octet string that it contains. Verify that the string equals nonce.
             var nonceInCert = NonceFromAttnCertExts(attestnCert.Extensions);
             if (nonceInCert == null)
