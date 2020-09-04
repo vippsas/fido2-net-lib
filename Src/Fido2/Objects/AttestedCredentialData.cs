@@ -25,7 +25,7 @@ namespace Fido2NetLib.Objects
         public byte[] CredentialID { get; private set; }
 
         /// <summary>
-        /// The credential public key encoded in COSE_Key format, as defined in 
+        /// The credential public key encoded in COSE_Key format, as defined in
         /// Section 7 of RFC8152, using the CTAP2 canonical CBOR encoding form.
         /// <see cref="https://www.w3.org/TR/webauthn/#credential-public-key"/>
         /// </summary>
@@ -103,7 +103,7 @@ namespace Fido2NetLib.Objects
                 AaGuid = new Guid(aaguidBytes);
             }
 
-            // Byte length of Credential ID, 16-bit unsigned big-endian integer. 
+            // Byte length of Credential ID, 16-bit unsigned big-endian integer.
             var credentialIDLenBytes = reader.ReadBytes(sizeof(ushort));
 
             if (BitConverter.IsLittleEndian)
@@ -118,8 +118,8 @@ namespace Fido2NetLib.Objects
             // Read the credential ID bytes
             CredentialID = reader.ReadBytes(credentialIDLen);
 
-            // "Determining attested credential data's length, which is variable, involves determining 
-            // credentialPublicKey's beginning location given the preceding credentialId's length, and 
+            // "Determining attested credential data's length, which is variable, involves determining
+            // credentialPublicKey's beginning location given the preceding credentialId's length, and
             // then determining the credentialPublicKey's length"
 
             // Read the CBOR object from the stream
