@@ -55,7 +55,7 @@ namespace Fido2NetLib
 
         // todo: add TokenBinding https://www.w3.org/TR/webauthn/#dictdef-tokenbinding
 
-        protected void BaseVerify(string expectedOrigin, byte[] originalChallenge, byte[] requestTokenBindingId)
+        protected void BaseVerify(string[] expectedOrigins, byte[] originalChallenge, byte[] requestTokenBindingId)
         {
             if (Type != "webauthn.create" && Type != "webauthn.get")
                 throw new Fido2VerificationException($"Type not equal to 'webauthn.create' or 'webauthn.get'. Was: '{Type}'");
@@ -68,10 +68,19 @@ namespace Fido2NetLib
                 throw new Fido2VerificationException("Challenge not equal to original challenge");
 
             // 5. Verify that the value of C.origin matches the Relying Party's origin.
-            if (Origin != expectedOrigin)
-                throw new Fido2VerificationException($"Origin {Origin} not equal to original origin {expectedOrigin}");
+            if (expectedOrigins == null || expectedOrigins.Length < 1 || expectedOrigins[0] == null)
+            {
+                throw new Fido2VerificationException("Configuration error - at least one allowable origin must be configured");
+            }
+            if (!expectedOrigins.Contains(Origin))
+            {
+                var expectedOriginString = expectedOrigins.Length > 1
+                    ? "(one of " + string.Join(", ", expectedOrigins) + ")"
+                    : expectedOrigins[0];
+                throw new Fido2VerificationException($"Origin {Origin} not equal to original origin {expectedOriginString}");
+            }
 
-            // 6. Verify that the value of C.tokenBinding.status matches the state of Token Binding for the TLS connection over which the assertion was obtained. 
+            // 6. Verify that the value of C.tokenBinding.status matches the state of Token Binding for the TLS connection over which the assertion was obtained.
             // If Token Binding was used on that TLS connection, also verify that C.tokenBinding.id matches the base64url encoding of the Token Binding ID for the connection.
             if (TokenBinding != null)
             {

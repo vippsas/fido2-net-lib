@@ -50,13 +50,13 @@ namespace Fido2NetLib
         /// <param name="requestTokenBindingId"></param>
         public async Task<AssertionVerificationResult> VerifyAsync(
             AssertionOptions options,
-            string expectedOrigin,
+            string[] expectedOrigins,
             byte[] storedPublicKey,
             uint storedSignatureCounter,
             IsUserHandleOwnerOfCredentialIdAsync isUserHandleOwnerOfCredId,
             byte[] requestTokenBindingId)
         {
-            BaseVerify(expectedOrigin, options.Challenge, requestTokenBindingId);
+            BaseVerify(expectedOrigins, options.Challenge, requestTokenBindingId);
 
             if (Raw.Type != PublicKeyCredentialType.PublicKey)
                 throw new Fido2VerificationException("AssertionResponse Type is not set to public-key");
@@ -139,14 +139,14 @@ namespace Fido2NetLib
             // UNLESS...userPresent is true?
             // see ee Server-ServerAuthenticatorAssertionResponse-Resp3 Test server processing authenticatorData
             // P-8 Send a valid ServerAuthenticatorAssertionResponse both authenticatorData.flags.UV and authenticatorData.flags.UP are not set, for userVerification set to "discouraged", and check that server succeeds
-            if (UserVerificationRequirement.Required == options.UserVerification && false == authData.UserVerified) 
+            if (UserVerificationRequirement.Required == options.UserVerification && false == authData.UserVerified)
                 throw new Fido2VerificationException("User verification is required");
 
             // 14. Verify that the values of the client extension outputs in clientExtensionResults and the authenticator extension outputs in the extensions in authData are as expected, considering the client extension input values that were given as the extensions option in the get() call.In particular, any extension identifier values in the clientExtensionResults and the extensions in authData MUST be also be present as extension identifier values in the extensions member of options, i.e., no extensions are present that were not requested. In the general case, the meaning of "are as expected" is specific to the Relying Party and which extensions are in use.
             // todo: Verify this (and implement extensions on options)
-            if (true == authData.HasExtensionsData && ((null == authData.Extensions) || (0 == authData.Extensions.Length))) 
+            if (true == authData.HasExtensionsData && ((null == authData.Extensions) || (0 == authData.Extensions.Length)))
                 throw new Fido2VerificationException("Extensions flag present, malformed extensions detected");
-            if (false == authData.HasExtensionsData && (null != authData.Extensions)) 
+            if (false == authData.HasExtensionsData && (null != authData.Extensions))
                 throw new Fido2VerificationException("Extensions flag not present, but extensions detected");
 
             // 15.
@@ -157,10 +157,10 @@ namespace Fido2NetLib
             Buffer.BlockCopy(Raw.Response.AuthenticatorData, 0, data, 0, Raw.Response.AuthenticatorData.Length);
             Buffer.BlockCopy(hashedClientDataJson, 0, data, Raw.Response.AuthenticatorData.Length, hashedClientDataJson.Length);
 
-            if (null == storedPublicKey || 0 == storedPublicKey.Length) 
+            if (null == storedPublicKey || 0 == storedPublicKey.Length)
                 throw new Fido2VerificationException("Stored public key is null or empty");
             var cpk = new CredentialPublicKey(storedPublicKey);
-            if (true != cpk.Verify(data, Signature)) 
+            if (true != cpk.Verify(data, Signature))
                 throw new Fido2VerificationException("Signature did not match");
 
             // 17.

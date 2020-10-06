@@ -74,11 +74,11 @@ namespace Fido2NetLib
             var success = await parsedResponse.VerifyAsync(origChallenge, _config, isCredentialIdUniqueToUser, _metadataService, requestTokenBindingId);
 
             // todo: Set Errormessage etc.
-            return new CredentialMakeResult 
-            { 
-                Status = "ok", 
-                ErrorMessage = string.Empty, 
-                Result = success 
+            return new CredentialMakeResult
+            {
+                Status = "ok",
+                ErrorMessage = string.Empty,
+                Result = success
             };
         }
 
@@ -113,7 +113,7 @@ namespace Fido2NetLib
             var parsedResponse = AuthenticatorAssertionResponse.Parse(assertionResponse);
 
             var result = await parsedResponse.VerifyAsync(originalOptions,
-                                                          _config.Origin,
+                                                          _config.Origins,
                                                           storedPublicKey,
                                                           storedSignatureCounter,
                                                           isUserHandleOwnerOfCredentialIdCallback,

@@ -1,11 +1,12 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 
 namespace Fido2NetLib
 {
     public class Fido2Configuration
     {
         /// <summary>
-        /// This member specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. 
+        /// This member specifies a time, in milliseconds, that the caller is willing to wait for the call to complete.
         /// This is treated as a hint, and MAY be overridden by the client.
         /// </summary>
         public uint Timeout { get; set; } = 60000;
@@ -36,9 +37,21 @@ namespace Fido2NetLib
         public string ServerIcon { get; set; }
 
         /// <summary>
-        /// Server origin, including protocol host and port.
+        /// List of allowable server origins, including protocol host and port.
         /// </summary>
-        public string Origin { get; set; }
+        public string[] Origins { get; set; }
+
+        /// <summary>
+        /// Server origin, including protocol host and port
+        /// </summary>
+        public string Origin
+        {
+            get => Origins?.FirstOrDefault();
+            set
+            {
+                Origins = new[] {value};
+            }
+        }
 
         /// <summary>
         /// MDSAccessKey
