@@ -68,7 +68,7 @@ namespace Fido2NetLib
                 throw new Fido2VerificationException("Challenge not equal to original challenge");
 
             // 5. Verify that the value of C.origin matches the Relying Party's origin.
-            if (expectedOrigins == null || expectedOrigins.Length < 1 || expectedOrigins[0] == null)
+            if (expectedOrigins == null || expectedOrigins.Length == 0 || expectedOrigins[0] == null)
             {
                 throw new Fido2VerificationException("Configuration error - at least one allowable origin must be configured");
             }
