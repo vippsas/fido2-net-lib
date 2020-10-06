@@ -37,7 +37,7 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./scripts/buildRelease.ps1
-      arguments: '"-p:Version=2.0.0-preview2-vipps$(Build.BuildNumber)"'
+      arguments: '"-p:Version=2.0.0.$(Build.BuildNumber}-preview2-vipps"'
   - task: NuGetCommand@2
     displayName: Upload NuGet packages
     inputs:
