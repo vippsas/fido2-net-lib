@@ -12,7 +12,7 @@ namespace Test
     public class MetadataServiceTests
     {
 
-        [Fact]
+        [Fact(Skip="The conformance test metadata service https://fidoalliance.co.nz is currently not resolvable")]
         public async Task ConformanceTestClient()
         {
             var client = new ConformanceMetadataRepository(null, "http://localhost");
