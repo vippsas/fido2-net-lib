@@ -48,12 +48,24 @@ namespace Test.Attestation
         }
 
         [Fact]
+        public async Task TestValidAttestationWithoutAlg()
+        {
+            _attestationObject.Add("attStmt", CBORObject.NewMap()
+                .Add("x5c", MakeX5C()));
+
+            await MakeAttestationResponse();
+        }
+
+
+        /*
+        [Fact]
         public void TestMissingAlg()
         {
             _attestationObject.Add("attStmt", CBORObject.NewMap().Add("x5c", MakeX5C()));
             var ex = Assert.ThrowsAsync<Fido2VerificationException>(MakeAttestationResponse);
             Assert.Equal("Invalid apple attestation algorithm", ex.Result.Message);
         }
+        */
 
         [Fact]
         public void TestAlgNaN()

@@ -22,7 +22,7 @@ namespace Fido2NetLib.AttestationFormat
 
         internal CBORObject Sig => attStmt["sig"];
         internal CBORObject X5c => attStmt["x5c"];
-        internal CBORObject Alg => attStmt["alg"];
+        internal virtual CBORObject Alg => attStmt["alg"];
         internal CBORObject EcdaaKeyId => attStmt["ecdaaKeyId"];
         internal AuthenticatorData AuthData => new AuthenticatorData(authenticatorData);
         internal CBORObject CredentialPublicKey => AuthData.AttestedCredentialData.CredentialPublicKey.GetCBORObject();
