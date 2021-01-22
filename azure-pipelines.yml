@@ -10,7 +10,6 @@ jobs:
   displayName: Library build
   pool:
     vmImage: $(TargetVmImage)
-  dependsOn: prepare
   steps:
   - task: NuGetToolInstaller@1
     displayName: Install latest NuGet
