@@ -48,11 +48,13 @@ namespace Test.Attestation
         }
 
         [Fact]
-        public void TestMissingAlg()
+        public async Task TestValidAttestationWithoutAlg()
         {
-            _attestationObject.Add("attStmt", CBORObject.NewMap().Add("x5c", MakeX5C()));
-            var ex = Assert.ThrowsAsync<Fido2VerificationException>(MakeAttestationResponse);
-            Assert.Equal("Invalid apple attestation algorithm", ex.Result.Message);
+            // Apple attestation statements may not contain an "alg" attribute. The default algorithm is ES256 (-7).
+            _attestationObject.Add("attStmt", CBORObject.NewMap()
+                .Add("x5c", MakeX5C()));
+
+            await MakeAttestationResponse();
         }
 
         [Fact]

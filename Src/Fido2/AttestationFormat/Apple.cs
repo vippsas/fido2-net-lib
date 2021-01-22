@@ -12,12 +12,17 @@ namespace Fido2NetLib.AttestationFormat
 
     internal class Apple : AttestationFormat
     {
+        private static readonly CBORObject _defaultAlgorithm = CBORObject.FromObject((int)COSE.Algorithm.ES256);
+
         private readonly IMetadataService _metadataService;
         public Apple(CBORObject attStmt, byte[] authenticatorData, byte[] clientDataHash, IMetadataService metadataService)
             : base(attStmt, authenticatorData, clientDataHash)
         {
             _metadataService = metadataService;
         }
+
+        // Apple attestation statements may not contain an "alg" attribute. The default algorithm is ES256 (-7).
+        internal override CBORObject Alg => attStmt["alg"] ?? _defaultAlgorithm;
 
         public override void Verify()
         {

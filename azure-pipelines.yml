@@ -6,9 +6,8 @@ variables:
   TargetVmImage: windows-latest
 
 jobs:
-# Prepare the environment for the other tasks
-- job: prepare
-  displayName: Prepare environment
+- job: build
+  displayName: Library build
   pool:
     vmImage: $(TargetVmImage)
   steps:
@@ -24,14 +23,6 @@ jobs:
       command: restore
       includeNuGetOrg: true
       noCache: true
-
-# Build the main library
-- job: lib
-  displayName: Library build
-  pool:
-    vmImage: $(TargetVmImage)
-  dependsOn: prepare
-  steps:
   - task: PowerShell@2
     displayName: Run build script (lib only, release mode)
     inputs:
@@ -46,14 +37,6 @@ jobs:
       feedsToUse: 'select'
       publishVstsFeed: 'release'
       allowPackageConflicts: true
-
-# Publish the demo website
-- job: demo
-  displayName: Demo build
-  pool:
-    vmImage: $(TargetVmImage)
-  dependsOn: lib
-  steps:
   - task: DotNetCoreCLI@2
     displayName: Publish website
     inputs:
@@ -63,14 +46,6 @@ jobs:
     displayName: Copy website to artifacts
     inputs:
       ArtifactName: demodrop
-
-# Run unit tests
-- job: tests
-  displayName: Unit tests
-  pool:
-    vmImage: $(TargetVmImage)
-  dependsOn: lib
-  steps:
   - task: DotNetCoreCLI@2
     displayName: Run unit tests
     inputs:
